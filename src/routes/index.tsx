@@ -50,6 +50,7 @@ const card = "rounded-xl border border-border bg-card p-5";
 function Report() {
   const [tab, setTab] = useState<"analysis" | "timeline">("analysis");
   const [subCat, setSubCat] = useState<D.Cat | "全部">("全部");
+  const [subDim, setSubDim] = useState<"skeleton" | "cat">("skeleton");
   const [majorOnly, setMajorOnly] = useState(false);
   const [metric, setMetric] = useState<(typeof D.METRICS)[number]>("销售额");
   const [region, setRegion] = useState<(typeof D.REGIONS)[number] | "全部">("全部");
@@ -119,12 +120,46 @@ function Report() {
                 </div>
               ))}
             </div>
-            <div className="mt-8 flex items-center justify-between gap-4">
-              <h3 className="font-medium">关键子公司骨架</h3>
-              <Chips items={D.CATS} value={subCat} onChange={setSubCat} />
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <h3 className="font-medium">关键子公司骨架</h3>
+                <div className="flex rounded-full border border-border bg-card p-0.5 text-xs">
+                  {([["skeleton", "公司骨架（财报口径）"], ["cat", "按品类"]] as const).map(([k, t]) => (
+                    <button key={k} onClick={() => setSubDim(k)} className={`rounded-full px-3 py-1 ${subDim === k ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              {subDim === "cat" && <Chips items={["HNB低温", "雾化", "口含"] as D.Cat[]} value={subCat} onChange={setSubCat} />}
             </div>
+            {subDim === "skeleton" ? (
+              <div className="mt-4">
+                <div className="mx-auto w-fit rounded-lg border border-primary bg-primary px-4 py-2 text-sm text-primary-foreground">Philip Morris International Inc.（母公司）</div>
+                <div className="mt-4 grid gap-4 lg:grid-cols-4">
+                  {D.GROUPS.map((g) => (
+                    <div key={g} className="space-y-3 border-t-2 border-primary pt-3">
+                      <p className="text-sm font-medium">{g}</p>
+                      {D.subsidiaries.filter((s) => s.group === g).map((s) => (
+                        <div key={s.name} className={card}>
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="font-medium">{s.name}</h4>
+                          <span className="shrink-0 rounded bg-accent/15 px-2 py-0.5 text-xs text-accent">{s.cat}</span>
+                        </div>
+                        <ul className="mt-3 space-y-1.5 text-sm">
+                          <li><b className="font-medium text-muted-foreground">负责人 </b>{s.head}</li>
+                          <li><b className="font-medium text-muted-foreground">研发 </b>{s.rd}</li>
+                          <li><b className="font-medium text-muted-foreground">制造 </b>{s.factory}</li>
+                          <li><b className="font-medium text-muted-foreground">销售 </b>{s.sales}</li>
+                        </ul>
+                        {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
+                      </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
             <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {D.subsidiaries.filter((s) => subCat === "全部" || s.cat === subCat).map((s) => (
+              {D.subsidiaries.filter((s) => s.cat !== "传统卷烟" && (subCat === "全部" || s.cat === subCat)).map((s) => (
                 <div key={s.name} className={card}>
                   <div className="flex items-start justify-between gap-2">
                     <h4 className="font-medium">{s.name}</h4>
@@ -140,6 +175,7 @@ function Report() {
                 </div>
               ))}
             </div>
+            )}
           </Section>
 
           <Section id="commercial" title="2、商业表现" sub="商业大事记 · 核心指标 · 基本数据 sheet">
