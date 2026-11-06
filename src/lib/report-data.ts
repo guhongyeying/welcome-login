@@ -24,13 +24,13 @@ export const profile = [
 ];
 
 export const subsidiaries: {
-  name: string; group: "并购主体", cat: Cat; group: string; head: string; rd: string; factory: string; sales: string; note: string;
+  name: string; cat: Cat; group: string; head: string; rd: string; factory: string; sales: string; note: string;
 }[] = [
   { name: "PMI R&D Cube Neuchâtel", group: "研发中心", cat: "HNB低温", head: "研发负责人（待核）", rd: "瑞士纳沙泰尔 · 约 400–600 人（区间） · IQOS 平台研发", factory: "—", sales: "—", note: "研发投入重心" },
   { name: "Philip Morris Italia (Crespellano)", group: "生产制造", cat: "HNB低温", head: "工厂负责人（待核）", rd: "—", factory: "意大利博洛尼亚 · HEETS/TEREA 烟弹主力产地", sales: "欧盟 · 增长 +15%", note: "产能核心" },
   { name: "Philip Morris Korea", group: "生产制造", cat: "HNB低温", head: "（待核）", rd: "—", factory: "韩国梁山 · 面向亚洲市场烟弹", sales: "韩国 · 份额稳定", note: "" },
   { name: "Swedish Match AB", group: "并购主体", cat: "口含", head: "（待核）", rd: "瑞典 · 口含配方", factory: "瑞典 / 美国 Owensboro · ZYN", sales: "美国 · ZYN 增长 +40%", note: "口含主体" },
-  { name: "Fertin Pharma", cat: "口含", head: "（待核）", rd: "丹麦 · 口腔递送技术", factory: "丹麦 Vejle", sales: "B2B", note: "" },
+  { name: "Fertin Pharma", group: "并购主体", cat: "口含", head: "（待核）", rd: "丹麦 · 口腔递送技术", factory: "丹麦 Vejle", sales: "B2B", note: "" },
   { name: "PMI VEEV 业务单元", group: "业务单元", cat: "雾化", head: "（待核）", rd: "瑞士 · VEEV 平台", factory: "代工为主（中国深圳）", sales: "欧洲 30+ 市场", note: "代工依赖" },
   { name: "Philip Morris USA（历史）", group: "业务单元", cat: "传统卷烟", head: "—", rd: "—", factory: "全球 30+ 卷烟厂", sales: "全球 · 量 -2%/年", note: "现金牛" },
 ];
