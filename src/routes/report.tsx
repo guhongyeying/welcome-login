@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import * as D from "@/lib/report-data";
 
 export const Route = createFileRoute("/report")({
@@ -75,7 +75,7 @@ function Report() {
               {[D.legal, D.profile].map((rows, i) => (
                 <div key={i} className={card}>
                   <dl className="grid grid-cols-[7rem_1fr] gap-y-2 text-sm">
-                    {rows.map(([k, v]) => (<><dt key={k} className="text-muted-foreground">{k}</dt><dd>{v}</dd></>))}
+                    {rows.map(([k, v]) => (<Fragment key={k}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></Fragment>))}
                   </dl>
                 </div>
               ))}
@@ -112,8 +112,8 @@ function Report() {
                 <div />
                 {years.map((y) => <div key={y} className="border-b border-border pb-2 text-center text-xs font-medium">{y}</div>)}
                 {D.LANES.map((l) => (
-                  <>
-                    <div key={l.key} className="border-b border-border py-4 pr-2">
+                  <Fragment key={l.key}>
+                    <div className="border-b border-border py-4 pr-2">
                       <p className="font-medium">{l.key}线</p><p className="text-xs text-muted-foreground">{l.desc}</p>
                     </div>
                     {years.map((y) => (
@@ -124,7 +124,7 @@ function Report() {
                         ))}
                       </div>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </div>
             </div>
