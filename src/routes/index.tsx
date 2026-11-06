@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useState, type ReactNode } from "react";
 import * as D from "@/lib/report-data";
+import { CommercialCharts } from "@/components/CommercialCharts";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -158,7 +159,10 @@ function Report() {
                 </li>
               ))}
             </ol>
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+            <CommercialCharts />
+            <details className="mt-8">
+            <summary className="cursor-pointer text-sm font-medium">基本数据 sheet（图表数据依据）</summary>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <Chips items={D.REGIONS} value={region} onChange={setRegion} />
               <div className="flex gap-1 rounded-lg bg-secondary p-1">
                 {D.METRICS.map((m) => (
@@ -184,6 +188,7 @@ function Report() {
                 </tbody>
               </table>
             </div>
+          </details>
           </Section>
 
           <Section id="product" title="3、产品表现" sub="产品战略：各平台技术路线迭代">
