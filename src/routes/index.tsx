@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
 });
 
 const NAV = [
-  ["info", "1 公司基本信息"], ["timeline", "· 三线脉络"], ["commercial", "2 商业表现"], ["product", "3 产品表现"],
+  ["info", "1 公司基本信息"], ["commercial", "2 商业表现"], ["product", "3 产品表现"],
   ["tech", "4 技术表现"], ["compete", "5 竞品表现"], ["supply", "6 供应链"], ["future", "7 未来路线"],
 ];
 
@@ -47,6 +47,7 @@ function Section({ id, title, sub, children }: { id: string; title: string; sub?
 const card = "rounded-xl border border-border bg-card p-5";
 
 function Report() {
+  const [tab, setTab] = useState<"analysis" | "timeline">("analysis");
   const [subCat, setSubCat] = useState<D.Cat | "全部">("全部");
   const [majorOnly, setMajorOnly] = useState(false);
   const [metric, setMetric] = useState<(typeof D.METRICS)[number]>("销售额");
@@ -59,10 +60,47 @@ function Report() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-primary px-8 py-6 text-primary-foreground">
+      <header className="bg-primary px-8 pt-6 text-primary-foreground">
         <p className="text-xs tracking-widest text-primary-foreground/60">半年报 · 2026 H1 · 主体：低温 / 雾化 / 口含</p>
         <h1 className="mt-1 font-serif text-3xl">Philip Morris International</h1>
+        <div className="mt-5 flex gap-1">
+          {([["analysis", "公司分析"], ["timeline", "三线脉络"]] as const).map(([k, t]) => (
+            <button key={k} onClick={() => setTab(k)}
+              className={`rounded-t-lg px-5 py-2 text-sm font-medium transition ${tab === k ? "bg-background text-foreground" : "text-primary-foreground/70 hover:text-primary-foreground"}`}>{t}</button>
+          ))}
+        </div>
       </header>
+      {tab === "timeline" ? (
+        <div className="mx-auto max-w-7xl px-8">
+          <Section id="timeline" title="三线脉络" sub="品牌 / 投资 / 产线 三条主线并行展示（数据来源：财报）">
+            <label className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <input type="checkbox" checked={majorOnly} onChange={(e) => setMajorOnly(e.target.checked)} /> 仅显示重大事件（阈值）
+            </label>
+            <div className={`${card} overflow-x-auto`}>
+              <div className="grid min-w-[900px]" style={{ gridTemplateColumns: `7rem repeat(${years.length}, minmax(0,1fr))` }}>
+                <div />
+                {years.map((y) => <div key={y} className="border-b border-border pb-2 text-center text-xs font-medium">{y}</div>)}
+                {D.LANES.map((l) => (
+                  <Fragment key={l.key}>
+                    <div className="border-b border-border py-4 pr-2">
+                      <p className="font-medium">{l.key}线</p><p className="text-xs text-muted-foreground">{l.desc}</p>
+                    </div>
+                    {years.map((y) => (
+                      <div key={l.key + y} className="relative flex flex-col justify-center gap-1 border-b border-border px-1 py-4">
+                        <span className="absolute inset-x-0 top-1/2 h-px bg-border" />
+                        {evs.filter((e) => e.year === y && e.lane === l.key).map((e) => (
+                          <span key={e.title} className={`relative rounded-md px-1.5 py-1 text-[11px] leading-tight ${e.major ? "bg-accent text-accent-foreground" : "border border-border bg-background"}`}>{e.title}</span>
+                        ))}
+                      </div>
+                    ))}
+                  </Fragment>
+                ))}
+              </div>
+            </div>
+          </Section>
+
+        </div>
+      ) : (
       <div className="mx-auto flex max-w-7xl gap-8 px-8">
         <nav className="sticky top-0 hidden h-screen w-44 shrink-0 py-10 lg:block">
           {NAV.map(([id, t]) => (
@@ -100,33 +138,6 @@ function Report() {
                   {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
                 </div>
               ))}
-            </div>
-          </Section>
-
-          <Section id="timeline" title="三线脉络 · 公司大事件" sub="品牌 / 投资 / 产线 三条主线并行展示（数据来源：财报）">
-            <label className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-              <input type="checkbox" checked={majorOnly} onChange={(e) => setMajorOnly(e.target.checked)} /> 仅显示重大事件（阈值）
-            </label>
-            <div className={`${card} overflow-x-auto`}>
-              <div className="grid min-w-[900px]" style={{ gridTemplateColumns: `7rem repeat(${years.length}, minmax(0,1fr))` }}>
-                <div />
-                {years.map((y) => <div key={y} className="border-b border-border pb-2 text-center text-xs font-medium">{y}</div>)}
-                {D.LANES.map((l) => (
-                  <Fragment key={l.key}>
-                    <div className="border-b border-border py-4 pr-2">
-                      <p className="font-medium">{l.key}线</p><p className="text-xs text-muted-foreground">{l.desc}</p>
-                    </div>
-                    {years.map((y) => (
-                      <div key={l.key + y} className="relative flex flex-col justify-center gap-1 border-b border-border px-1 py-4">
-                        <span className="absolute inset-x-0 top-1/2 h-px bg-border" />
-                        {evs.filter((e) => e.year === y && e.lane === l.key).map((e) => (
-                          <span key={e.title} className={`relative rounded-md px-1.5 py-1 text-[11px] leading-tight ${e.major ? "bg-accent text-accent-foreground" : "border border-border bg-background"}`}>{e.title}</span>
-                        ))}
-                      </div>
-                    ))}
-                  </Fragment>
-                ))}
-              </div>
             </div>
           </Section>
 
@@ -263,6 +274,7 @@ function Report() {
           </Section>
         </main>
       </div>
+      )}
     </div>
   );
 }
