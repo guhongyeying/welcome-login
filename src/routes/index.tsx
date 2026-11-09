@@ -133,7 +133,7 @@ function Report() {
             </div>
             {subDim === "skeleton" ? (
               <div className="mt-6 overflow-x-auto pb-2" role="tree" aria-label="PMI 母公司与关键子公司骨架">
-                <div className="min-w-[1100px]">
+                <div className="min-w-[960px]">
                   <div className="flex justify-center">
                     <div className="rounded-xl border border-primary bg-primary px-6 py-3 text-center text-primary-foreground shadow-sm" role="treeitem" aria-expanded="true">
                       <p className="text-xs text-primary-foreground/70">母公司</p>
