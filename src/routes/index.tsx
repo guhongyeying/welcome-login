@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Fragment, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import * as D from "@/lib/report-data";
 import { CommercialCharts } from "@/components/CommercialCharts";
 
@@ -47,6 +47,91 @@ function Section({ id, title, sub, children }: { id: string; title: string; sub?
 
 const card = "rounded-xl border border-border bg-card p-5";
 
+function KV({ title, rows }: { title: string; rows: [string, string][] }) {
+  return (
+    <div>
+      <p className="text-xs font-medium tracking-widest text-muted-foreground">{title}</p>
+      <dl className="mt-2 grid grid-cols-[6.5rem_1fr] gap-x-3 gap-y-2 text-sm">
+        {rows.map(([k, v]) => (
+          <Fragment key={k}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></Fragment>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function Tags({ label, items }: { label: string; items: string[] }) {
+  if (!items.length) return null;
+  return (
+    <div>
+      <p className="text-xs font-medium tracking-widest text-muted-foreground">{label}</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {items.map((t) => <span key={t} className="rounded-md bg-secondary px-2 py-1 text-xs">{t}</span>)}
+      </div>
+    </div>
+  );
+}
+
+function NodePanel({ info, onClose, onOpen }: { info: D.NodeInfo; onClose: () => void; onOpen: (id: string) => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const kids = D.childNodes(info.id);
+
+  return (
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={`${info.title} 节点详情`}>
+      <button aria-label="关闭节点详情" onClick={onClose} className="absolute inset-0 h-full w-full cursor-default bg-foreground/25 animate-in fade-in duration-200" />
+      <aside className="absolute inset-y-0 right-0 flex w-full max-w-md animate-in slide-in-from-right duration-200 flex-col border-l border-border bg-card shadow-2xl">
+        <div className="flex items-start justify-between gap-3 border-b border-border p-5">
+          <div className="min-w-0">
+            <p className="text-xs tracking-widest text-muted-foreground">{info.kind}{info.cat ? ` · ${info.cat}` : ""}</p>
+            <h3 className="mt-1 font-serif text-xl leading-snug">{info.title}</h3>
+            {info.enName && <p className="mt-0.5 text-xs text-muted-foreground">{info.enName}</p>}
+          </div>
+          <button onClick={onClose} className="shrink-0 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-secondary">关闭</button>
+        </div>
+        <div className="flex-1 space-y-5 overflow-y-auto p-5">
+          <p className="text-sm leading-relaxed">{info.summary}</p>
+          <KV title="基本信息" rows={info.basic} />
+          <KV title="业务详情" rows={info.business} />
+          <Tags label="产品 / 品牌" items={info.products} />
+          <Tags label="主要市场" items={info.markets} />
+          {info.events.length > 0 && (
+            <div>
+              <p className="text-xs font-medium tracking-widest text-muted-foreground">关键事件</p>
+              <ul className="mt-2 space-y-2 border-l border-accent/40 pl-3 text-sm">
+                {info.events.map((e) => <li key={e.year + e.text}><span className="font-serif">{e.year}</span>　{e.text}</li>)}
+              </ul>
+            </div>
+          )}
+          {info.risks.length > 0 && (
+            <div>
+              <p className="text-xs font-medium tracking-widest text-muted-foreground">风险与依赖</p>
+              <ul className="mt-2 space-y-1.5 text-sm">
+                {info.risks.map((r) => <li key={r} className="text-destructive">⚠ {r}</li>)}
+              </ul>
+            </div>
+          )}
+          {kids.length > 0 && (
+            <div>
+              <p className="text-xs font-medium tracking-widest text-muted-foreground">下属节点（点击查看）</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {kids.map((k) => (
+                  <button key={k.id} onClick={() => onOpen(k.id)} className="rounded-full border border-border px-3 py-1 text-xs hover:bg-secondary">{k.title}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          <p className="pt-1 text-xs text-muted-foreground">示例数据，需以财报核实。</p>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
 function Report() {
   const [tab, setTab] = useState<"analysis" | "timeline">("analysis");
   const [subCat, setSubCat] = useState<D.Cat | "全部">("全部");
@@ -56,6 +141,8 @@ function Report() {
   const [region, setRegion] = useState<(typeof D.REGIONS)[number] | "全部">("全部");
   const [supCat, setSupCat] = useState<D.Cat | "全部">("全部");
   const [supType, setSupType] = useState<(typeof D.SUPPLY)[number] | "全部">("全部");
+  const [nodeId, setNodeId] = useState<string | null>(null);
+  const nodeInfo = nodeId ? D.findNode(nodeId) : undefined;
 
   const years = Array.from(new Set(D.events.map((e) => e.year))).sort();
   const evs = D.events.filter((e) => !majorOnly || e.major);
@@ -110,7 +197,7 @@ function Report() {
           ))}
         </nav>
         <main className="min-w-0 flex-1">
-          <Section id="info" title="1、公司基本信息" sub="法人主体 · 关键子公司骨架">
+          <Section id="info" title="1、公司基本信息" sub="法人主体 · 关键子公司骨架（点击任意节点查看基本信息与业务详情）">
             <div className="grid gap-4 md:grid-cols-2">
               {[D.legal, D.profile].map((rows, i) => (
                 <div key={i} className={card}>
