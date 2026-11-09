@@ -222,10 +222,10 @@ function Report() {
               <div className="mt-6 overflow-x-auto pb-2" role="tree" aria-label="PMI 母公司与关键子公司骨架">
                 <div className="min-w-[960px]">
                   <div className="flex justify-center">
-                    <div className="rounded-xl border border-primary bg-primary px-6 py-3 text-center text-primary-foreground shadow-sm" role="treeitem" aria-expanded="true">
-                      <p className="text-xs text-primary-foreground/70">母公司</p>
+                    <button onClick={() => setNodeId("parent")} title="查看母公司详情" className="rounded-xl border border-primary bg-primary px-6 py-3 text-center text-primary-foreground shadow-sm transition hover:bg-primary/90">
+                      <p className="text-xs text-primary-foreground/70">母公司 · 点击查看详情</p>
                       <p className="mt-0.5 font-medium">Philip Morris International Inc.</p>
-                    </div>
+                    </button>
                   </div>
                   <div className="mx-auto h-7 w-px bg-primary/40" />
                   <div className="relative pt-7" role="group">
@@ -236,13 +236,13 @@ function Report() {
                         return (
                           <div key={g} className="relative" role="treeitem" aria-expanded="true">
                             <div className="absolute -top-7 left-1/2 h-7 w-px bg-primary/40" />
-                            <div className="relative z-10 mx-auto w-fit min-w-32 rounded-lg border border-primary/40 bg-secondary px-4 py-2 text-center">
+                            <button key={g} onClick={() => setNodeId(`group:${g}`)} title={`查看${g}详情`} className="relative z-10 mx-auto block w-fit min-w-32 rounded-lg border border-primary/40 bg-secondary px-4 py-2 text-center transition hover:border-primary hover:bg-primary/10">
                               <p className="text-sm font-medium">{g}</p>
                               <p className="mt-0.5 text-xs text-muted-foreground">{children.length} 家子公司</p>
-                            </div>
+                            </button>
                             <div className="relative ml-4 mt-4 space-y-3 border-l border-primary/30 pl-4" role="group">
                               {children.map((s) => (
-                                <div key={s.name} className={`${card} relative`} role="treeitem">
+                                <button key={s.name} onClick={() => setNodeId(s.name)} title="查看子公司详情" className={`${card} relative block w-full text-left transition hover:border-primary/60 hover:bg-secondary/40`}>
                                   <span className="absolute -left-4 top-7 h-px w-4 bg-primary/30" />
                                   <span className="absolute -left-[5px] top-[26px] size-2 rounded-full border border-primary/40 bg-background" />
                                   <div className="flex items-start justify-between gap-2">
@@ -256,7 +256,7 @@ function Report() {
                                     <li><b className="font-medium text-muted-foreground">销售 </b>{s.sales}</li>
                                   </ul>
                                   {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
-                                </div>
+                                </button>
                               ))}
                             </div>
                           </div>
