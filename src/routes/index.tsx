@@ -51,7 +51,7 @@ function KV({ title, rows }: { title: string; rows: [string, string][] }) {
   return (
     <div>
       <p className="text-xs font-medium tracking-widest text-muted-foreground">{title}</p>
-      <dl className="mt-2 grid grid-cols-[6.5rem_1fr] gap-x-3 gap-y-2 text-sm">
+      <dl className="mt-2 grid grid-cols-[7.5rem_1fr] gap-x-3 gap-y-2 text-sm">
         {rows.map(([k, v]) => (
           <Fragment key={k}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></Fragment>
         ))}
