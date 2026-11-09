@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Fragment, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import * as D from "@/lib/report-data";
 import { CommercialCharts } from "@/components/CommercialCharts";
 
@@ -47,6 +47,91 @@ function Section({ id, title, sub, children }: { id: string; title: string; sub?
 
 const card = "rounded-xl border border-border bg-card p-5";
 
+function KV({ title, rows }: { title: string; rows: [string, string][] }) {
+  return (
+    <div>
+      <p className="text-xs font-medium tracking-widest text-muted-foreground">{title}</p>
+      <dl className="mt-2 grid grid-cols-[7.5rem_1fr] gap-x-3 gap-y-2 text-sm">
+        {rows.map(([k, v]) => (
+          <Fragment key={k}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></Fragment>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function Tags({ label, items }: { label: string; items: string[] }) {
+  if (!items.length) return null;
+  return (
+    <div>
+      <p className="text-xs font-medium tracking-widest text-muted-foreground">{label}</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {items.map((t) => <span key={t} className="rounded-md bg-secondary px-2 py-1 text-xs">{t}</span>)}
+      </div>
+    </div>
+  );
+}
+
+function NodePanel({ info, onClose, onOpen }: { info: D.NodeInfo; onClose: () => void; onOpen: (id: string) => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const kids = D.childNodes(info.id);
+
+  return (
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={`${info.title} 节点详情`}>
+      <button aria-label="关闭节点详情" onClick={onClose} className="absolute inset-0 h-full w-full cursor-default bg-foreground/25 animate-in fade-in duration-200" />
+      <aside className="absolute inset-y-0 right-0 flex w-full max-w-md animate-in slide-in-from-right duration-200 flex-col border-l border-border bg-card shadow-2xl">
+        <div className="flex items-start justify-between gap-3 border-b border-border p-5">
+          <div className="min-w-0">
+            <p className="text-xs tracking-widest text-muted-foreground">{info.kind}{info.cat ? ` · ${info.cat}` : ""}</p>
+            <h3 className="mt-1 font-serif text-xl leading-snug">{info.title}</h3>
+            {info.enName && <p className="mt-0.5 text-xs text-muted-foreground">{info.enName}</p>}
+          </div>
+          <button onClick={onClose} className="shrink-0 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-secondary">关闭</button>
+        </div>
+        <div className="flex-1 space-y-5 overflow-y-auto p-5">
+          <p className="text-sm leading-relaxed">{info.summary}</p>
+          <KV title="基本信息" rows={info.basic} />
+          <KV title="业务详情" rows={info.business} />
+          <Tags label="产品 / 品牌" items={info.products} />
+          <Tags label="主要市场" items={info.markets} />
+          {info.events.length > 0 && (
+            <div>
+              <p className="text-xs font-medium tracking-widest text-muted-foreground">关键事件</p>
+              <ul className="mt-2 space-y-2 border-l border-accent/40 pl-3 text-sm">
+                {info.events.map((e) => <li key={e.year + e.text}><span className="font-serif">{e.year}</span>　{e.text}</li>)}
+              </ul>
+            </div>
+          )}
+          {info.risks.length > 0 && (
+            <div>
+              <p className="text-xs font-medium tracking-widest text-muted-foreground">风险与依赖</p>
+              <ul className="mt-2 space-y-1.5 text-sm">
+                {info.risks.map((r) => <li key={r} className="text-destructive">⚠ {r}</li>)}
+              </ul>
+            </div>
+          )}
+          {kids.length > 0 && (
+            <div>
+              <p className="text-xs font-medium tracking-widest text-muted-foreground">下属节点（点击查看）</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {kids.map((k) => (
+                  <button key={k.id} onClick={() => onOpen(k.id)} className="rounded-full border border-border px-3 py-1 text-xs hover:bg-secondary">{k.title}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          <p className="pt-1 text-xs text-muted-foreground">示例数据，需以财报核实。</p>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
 function Report() {
   const [tab, setTab] = useState<"analysis" | "timeline">("analysis");
   const [subCat, setSubCat] = useState<D.Cat | "全部">("全部");
@@ -56,6 +141,8 @@ function Report() {
   const [region, setRegion] = useState<(typeof D.REGIONS)[number] | "全部">("全部");
   const [supCat, setSupCat] = useState<D.Cat | "全部">("全部");
   const [supType, setSupType] = useState<(typeof D.SUPPLY)[number] | "全部">("全部");
+  const [nodeId, setNodeId] = useState<string | null>(null);
+  const nodeInfo = nodeId ? D.findNode(nodeId) : undefined;
 
   const years = Array.from(new Set(D.events.map((e) => e.year))).sort();
   const evs = D.events.filter((e) => !majorOnly || e.major);
@@ -110,7 +197,7 @@ function Report() {
           ))}
         </nav>
         <main className="min-w-0 flex-1">
-          <Section id="info" title="1、公司基本信息" sub="法人主体 · 关键子公司骨架">
+          <Section id="info" title="1、公司基本信息" sub="法人主体 · 关键子公司骨架（点击任意节点查看基本信息与业务详情）">
             <div className="grid gap-4 md:grid-cols-2">
               {[D.legal, D.profile].map((rows, i) => (
                 <div key={i} className={card}>
@@ -135,10 +222,10 @@ function Report() {
               <div className="mt-6 overflow-x-auto pb-2" role="tree" aria-label="PMI 母公司与关键子公司骨架">
                 <div className="min-w-[960px]">
                   <div className="flex justify-center">
-                    <div className="rounded-xl border border-primary bg-primary px-6 py-3 text-center text-primary-foreground shadow-sm" role="treeitem" aria-expanded="true">
-                      <p className="text-xs text-primary-foreground/70">母公司</p>
+                    <button onClick={() => setNodeId("parent")} title="查看母公司详情" className="rounded-xl border border-primary bg-primary px-6 py-3 text-center text-primary-foreground shadow-sm transition hover:bg-primary/90">
+                      <p className="text-xs text-primary-foreground/70">母公司 · 点击查看详情</p>
                       <p className="mt-0.5 font-medium">Philip Morris International Inc.</p>
-                    </div>
+                    </button>
                   </div>
                   <div className="mx-auto h-7 w-px bg-primary/40" />
                   <div className="relative pt-7" role="group">
@@ -149,13 +236,13 @@ function Report() {
                         return (
                           <div key={g} className="relative" role="treeitem" aria-expanded="true">
                             <div className="absolute -top-7 left-1/2 h-7 w-px bg-primary/40" />
-                            <div className="relative z-10 mx-auto w-fit min-w-32 rounded-lg border border-primary/40 bg-secondary px-4 py-2 text-center">
+                            <button onClick={() => setNodeId(`group:${g}`)} title={`查看${g}详情`} className="relative z-10 mx-auto block w-fit min-w-32 rounded-lg border border-primary/40 bg-secondary px-4 py-2 text-center transition hover:border-primary hover:bg-primary/10">
                               <p className="text-sm font-medium">{g}</p>
                               <p className="mt-0.5 text-xs text-muted-foreground">{children.length} 家子公司</p>
-                            </div>
+                            </button>
                             <div className="relative ml-4 mt-4 space-y-3 border-l border-primary/30 pl-4" role="group">
                               {children.map((s) => (
-                                <div key={s.name} className={`${card} relative`} role="treeitem">
+                                <button key={s.name} onClick={() => setNodeId(s.name)} title="查看子公司详情" className={`${card} relative block w-full text-left transition hover:border-primary/60 hover:bg-secondary/40`}>
                                   <span className="absolute -left-4 top-7 h-px w-4 bg-primary/30" />
                                   <span className="absolute -left-[5px] top-[26px] size-2 rounded-full border border-primary/40 bg-background" />
                                   <div className="flex items-start justify-between gap-2">
@@ -169,7 +256,7 @@ function Report() {
                                     <li><b className="font-medium text-muted-foreground">销售 </b>{s.sales}</li>
                                   </ul>
                                   {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
-                                </div>
+                                </button>
                               ))}
                             </div>
                           </div>
@@ -182,7 +269,7 @@ function Report() {
             ) : (
             <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {D.subsidiaries.filter((s) => s.cat !== "传统卷烟" && (subCat === "全部" || s.cat === subCat)).map((s) => (
-                <div key={s.name} className={card}>
+                <button key={s.name} onClick={() => setNodeId(s.name)} title="查看子公司详情" className={`${card} text-left transition hover:border-primary/60 hover:bg-secondary/40`}>
                   <div className="flex items-start justify-between gap-2">
                     <h4 className="font-medium">{s.name}</h4>
                     <span className="shrink-0 rounded bg-accent/15 px-2 py-0.5 text-xs text-accent">{s.cat}</span>
@@ -194,7 +281,7 @@ function Report() {
                     <li><b className="font-medium text-muted-foreground">销售 </b>{s.sales}</li>
                   </ul>
                   {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
-                </div>
+                </button>
               ))}
             </div>
             )}
@@ -338,6 +425,7 @@ function Report() {
         </main>
       </div>
       )}
+      {nodeInfo && <NodePanel info={nodeInfo} onClose={() => setNodeId(null)} onOpen={(id) => setNodeId(id)} />}
     </div>
   );
 }
