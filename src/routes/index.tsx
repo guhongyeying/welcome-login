@@ -269,7 +269,7 @@ function Report() {
             ) : (
             <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {D.subsidiaries.filter((s) => s.cat !== "传统卷烟" && (subCat === "全部" || s.cat === subCat)).map((s) => (
-                <div key={s.name} className={card}>
+                <button key={s.name} onClick={() => setNodeId(s.name)} title="查看子公司详情" className={`${card} text-left transition hover:border-primary/60 hover:bg-secondary/40`}>
                   <div className="flex items-start justify-between gap-2">
                     <h4 className="font-medium">{s.name}</h4>
                     <span className="shrink-0 rounded bg-accent/15 px-2 py-0.5 text-xs text-accent">{s.cat}</span>
