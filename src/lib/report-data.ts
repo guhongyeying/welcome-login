@@ -123,3 +123,344 @@ export const transfers = [
   { kind: "技术", from: "电阻加热", to: "感应 / 微波加热", why: "加热均匀、规避专利" },
   { kind: "地区", from: "日韩", to: "欧洲 / 美国", why: "监管放开、人口基数" },
 ];
+
+// ============= 公司树节点详情（示例/估算值，需以财报核实） =============
+export type NodeKind = "母公司" | "分支" | "子公司";
+export type NodeInfo = {
+  id: string;
+  kind: NodeKind;
+  title: string;
+  enName?: string;
+  cat?: Cat;
+  summary: string;
+  basic: [string, string][];
+  business: [string, string][];
+  products: string[];
+  markets: string[];
+  events: { year: string; text: string }[];
+  risks: string[];
+  children?: string[];
+};
+
+export const nodes: NodeInfo[] = [
+  {
+    id: "parent", kind: "母公司", title: "Philip Morris International Inc.", enName: "PMI · NYSE: PM",
+    summary: "集团母公司，负责全球战略、无烟产品平台与资本配置；财报口径下按四类分支管理关键子公司。",
+    basic: [
+      ["规范名称", "Philip Morris International Inc."],
+      ["中文名称", "菲利普莫里斯国际"],
+      ["简称 / 别名", "PMI"],
+      ["主体类型", "跨国烟草集团（母公司）"],
+      ["总部 / 主要基地", "美国斯坦福德 / 瑞士洛桑"],
+      ["上市代码 / 交易所", "PM / NYSE"],
+      ["成立日期", "2008-03（自奥驰亚分拆）"],
+      ["员工规模", "≈ 83,000"],
+      ["管理层 / 董事会", "CEO Jacek Olczak"],
+      ["官网", "pmi.com"],
+    ],
+    business: [
+      ["报告模式", "半年报"],
+      ["重点品类", "HNB低温 · 口含 · 雾化"],
+      ["总营收", "$37.9B（+7.7%）"],
+      ["无烟营收占比", "约 40%（2025）"],
+      ["下辖主体", "4 类分支 · 7 家关键子公司"],
+    ],
+    products: ["IQOS", "TEREA / HEETS", "VEEV", "ZYN"],
+    markets: ["欧洲", "美国", "亚洲", "欧亚其他"],
+    events: [
+      { year: "2008", text: "自奥驰亚分拆独立上市" },
+      { year: "2014", text: "IQOS 首发，进入低温烟业务" },
+      { year: "2022", text: "收购 Swedish Match，取得 ZYN" },
+      { year: "2025", text: "无烟营收占比约 40%，目标 2030 年超 2/3" },
+    ],
+    risks: ["感应加热专利与 BAT 的 ITC 诉讼", "FDA PMTA 与各国监管趋严", "传统卷烟量 -2%/年，现金牛承压"],
+    children: ["group:研发中心", "group:生产制造", "group:并购主体", "group:业务单元"],
+  },
+  {
+    id: "group:研发中心", kind: "分支", title: "研发中心",
+    summary: "财报口径的研发类主体：承担 IQOS 平台结构、烟弹配方与口腔递送技术研究。",
+    basic: [
+      ["分支类型", "研发"],
+      ["主体数量", "1 家（示例）"],
+      ["主要分布", "瑞士纳沙泰尔"],
+      ["对应品类", "HNB低温"],
+    ],
+    business: [
+      ["职能", "平台研发、配方与感官评价"],
+      ["投入方向", "研发投入重心，倾向 ILUMA 平台"],
+      ["成果", "IQOS ILUMA / TEREA 配方"],
+    ],
+    products: ["IQOS ILUMA", "TEREA"],
+    markets: ["内部服务全球市场"],
+    events: [
+      { year: "2014", text: "刀片加热平台成型" },
+      { year: "2021", text: "感应加热 ILUMA 进入量产" },
+    ],
+    risks: ["核心研发人才集中", "专利诉讼影响平台路线"],
+    children: ["PMI R&D Cube Neuchâtel"],
+  },
+  {
+    id: "group:生产制造", kind: "分支", title: "生产制造",
+    summary: "烟弹与设备制造类主体：欧盟与亚洲两大产能支点。",
+    basic: [
+      ["分支类型", "制造"],
+      ["主体数量", "2 家（示例）"],
+      ["主要分布", "意大利博洛尼亚 / 韩国梁山"],
+      ["对应品类", "HNB低温"],
+    ],
+    business: [
+      ["职能", "HEETS / TEREA 烟弹与设备制造"],
+      ["产能定位", "欧盟主力 + 亚洲供应"],
+      ["扩张方式", "既有卷烟厂转产 HNB 产线"],
+    ],
+    products: ["HEETS", "TEREA"],
+    markets: ["欧盟", "韩国", "亚洲"],
+    events: [
+      { year: "2014", text: "博洛尼亚 HNB 工厂投产" },
+      { year: "2017", text: "韩国梁山烟弹工厂" },
+    ],
+    risks: ["产能地区集中", "关税与本地化合规成本"],
+    children: ["Philip Morris Italia (Crespellano)", "Philip Morris Korea"],
+  },
+  {
+    id: "group:并购主体", kind: "分支", title: "并购主体",
+    summary: "通过收购纳入的独立法人：补口含品类与口腔递送技术。",
+    basic: [
+      ["分支类型", "并购"],
+      ["主体数量", "2 家（示例）"],
+      ["主要分布", "瑞典斯德哥尔摩 / 丹麦韦勒"],
+      ["对应品类", "口含"],
+    ],
+    business: [
+      ["职能", "尼古丁袋与口腔递送技术"],
+      ["取得方式", "2021 Fertin Pharma、2022 Swedish Match"],
+      ["协同", "配方 + 递送技术 + 品牌渠道"],
+    ],
+    products: ["ZYN", "尼古丁袋代工"],
+    markets: ["美国", "北欧", "B2B"],
+    events: [
+      { year: "2021", text: "收购 Fertin Pharma" },
+      { year: "2022", text: "收购 Swedish Match（ZYN）" },
+    ],
+    risks: ["FDA PMTA 与青少年使用审查", "并购整合与产能爬坡周期"],
+    children: ["Swedish Match AB", "Fertin Pharma"],
+  },
+  {
+    id: "group:业务单元", kind: "分支", title: "业务单元",
+    summary: "按品类划分的业务经营单元：雾化平台与传统卷烟存量。",
+    basic: [
+      ["分支类型", "业务单元"],
+      ["主体数量", "2 家（示例）"],
+      ["主要分布", "瑞士 / 全球存量网络"],
+      ["对应品类", "雾化 · 传统卷烟"],
+    ],
+    business: [
+      ["职能", "VEEV 雾化平台经营；传统卷烟存量管理"],
+      ["模式", "雾化以代工为主，自有品牌运营"],
+      ["定位", "雾化补位增长，卷烟提供现金流"],
+    ],
+    products: ["VEEV", "传统卷烟品牌"],
+    markets: ["欧洲 30+ 市场", "全球存量市场"],
+    events: [
+      { year: "2019", text: "VEEV 雾化发布" },
+      { year: "2025", text: "ILUMA i 系列带动设备更新" },
+    ],
+    risks: ["雾化代工依赖单一地区", "传统卷烟量 -2%/年"],
+    children: ["PMI VEEV 业务单元", "Philip Morris USA（历史）"],
+  },
+  {
+    id: "PMI R&D Cube Neuchâtel", kind: "子公司", title: "PMI R&D Cube Neuchâtel", cat: "HNB低温",
+    enName: "瑞士纳沙泰尔研发中心",
+    summary: "集团研发投入重心，IQOS 平台结构、烟弹配方与感官评价的核心实验基地。",
+    basic: [
+      ["节点类型", "研发中心"],
+      ["上级主体", "Philip Morris International Inc."],
+      ["所在地", "瑞士 纳沙泰尔"],
+      ["负责人", "研发负责人（待核）"],
+      ["员工规模", "约 400–600 人（区间）"],
+      ["持股", "100% 自有"],
+    ],
+    business: [
+      ["主营业务", "IQOS 平台研发（加热结构、烟弹配方、感官评价）"],
+      ["规模", "实验室 + 感官评价舱（待核）"],
+      ["营收贡献", "不单独披露，计入集团研发费用"],
+      ["服务对象", "全球平台与制造基地"],
+    ],
+    products: ["IQOS ILUMA", "TEREA 配方"],
+    markets: ["内部（服务全球）"],
+    events: [
+      { year: "2014", text: "刀片加热平台支撑 IQOS 首发" },
+      { year: "2021", text: "感应加热 ILUMA 量产落地" },
+    ],
+    risks: ["感应加热专利与 BAT glo 诉讼", "核心人才与设计知识高度集中"],
+  },
+  {
+    id: "Philip Morris Italia (Crespellano)", kind: "子公司", title: "Philip Morris Italia (Crespellano)", cat: "HNB低温",
+    enName: "意大利博洛尼亚 Crespellano 工厂",
+    summary: "HEETS / TEREA 烟弹主力产地，欧盟市场供给的产能核心。",
+    basic: [
+      ["节点类型", "制造基地"],
+      ["上级主体", "Philip Morris International Inc."],
+      ["所在地", "意大利 博洛尼亚 Crespellano"],
+      ["负责人", "工厂负责人（待核）"],
+      ["员工规模", "≈ 1,500+（待核）"],
+      ["持股", "100% 自有"],
+    ],
+    business: [
+      ["主营业务", "HEETS / TEREA 烟弹制造与包装"],
+      ["产能", "欧盟主力产能（待核）"],
+      ["营收贡献", "计入欧洲区域，不单独披露"],
+      ["主要市场", "欧盟 · 增长 +15%"],
+    ],
+    products: ["HEETS", "TEREA"],
+    markets: ["欧盟"],
+    events: [
+      { year: "2014", text: "博洛尼亚 HNB 工厂投产" },
+      { year: "2021", text: "产线切换至 TEREA（无刀片）" },
+    ],
+    risks: ["产能高度集中，单点故障影响欧盟供货", "欧盟税制与监管变动"],
+  },
+  {
+    id: "Philip Morris Korea", kind: "子公司", title: "Philip Morris Korea", cat: "HNB低温",
+    enName: "韩国梁山工厂",
+    summary: "面向亚洲市场的烟弹产地，与 KT&G 合作支撑 lil 品牌。",
+    basic: [
+      ["节点类型", "制造基地"],
+      ["上级主体", "Philip Morris International Inc."],
+      ["所在地", "韩国 梁山"],
+      ["负责人", "（待核）"],
+      ["员工规模", "（待核）"],
+      ["持股", "100% 自有"],
+    ],
+    business: [
+      ["主营业务", "HNB 烟弹制造，供应亚洲"],
+      ["合作", "与 KT&G 联合运营 lil 品牌"],
+      ["营收贡献", "韩国 · 份额稳定"],
+      ["主要市场", "韩国 / 亚洲"],
+    ],
+    products: ["lil", "HEETS"],
+    markets: ["韩国", "亚洲"],
+    events: [
+      { year: "2017", text: "韩国梁山烟弹工厂投产" },
+      { year: "2020", text: "与 KT&G 签署 lil 合作协议" },
+    ],
+    risks: ["与 KT&G 的利润分成", "韩国本土品牌竞争"],
+  },
+  {
+    id: "Swedish Match AB", kind: "子公司", title: "Swedish Match AB", cat: "口含",
+    enName: "瑞典斯德哥尔摩 · 2022 年被 PMI 收购",
+    summary: "口含品类主体，ZYN 品牌与配方的持有与运营方，无烟营收的重要来源。",
+    basic: [
+      ["节点类型", "并购主体"],
+      ["上级主体", "Philip Morris International Inc."],
+      ["所在地", "瑞典 斯德哥尔摩"],
+      ["成立", "1915（2022 年被 PMI 收购）"],
+      ["负责人", "（待核）"],
+      ["员工规模", "≈ 3,000+（待核）"],
+      ["持股", "100%"],
+    ],
+    business: [
+      ["主营业务", "尼古丁袋（ZYN）与口含烟"],
+      ["制造", "瑞典 / 美国 Owensboro 工厂"],
+      ["营收贡献", "美国 · ZYN 增长 +40%"],
+      ["主要市场", "美国 / 北欧"],
+    ],
+    products: ["ZYN", "口含烟（snus）"],
+    markets: ["美国", "北欧"],
+    events: [
+      { year: "2022", text: "PMI 完成收购，取得 ZYN" },
+      { year: "2023", text: "美国 ZYN 产能扩建" },
+      { year: "2024", text: "ZYN 产能翻倍计划推进" },
+    ],
+    risks: ["FDA PMTA 审批与青少年使用审查", "美国州级监管与诉讼风险"],
+  },
+  {
+    id: "Fertin Pharma", kind: "子公司", title: "Fertin Pharma", cat: "口含",
+    enName: "丹麦韦勒 · 2021 年被 PMI 收购",
+    summary: "口腔递送技术主体，为集团与合作客户提供尼古丁袋配方与代工能力。",
+    basic: [
+      ["节点类型", "并购主体"],
+      ["上级主体", "Philip Morris International Inc."],
+      ["所在地", "丹麦 韦勒（Vejle）"],
+      ["成立", "1969（2021 年被 PMI 收购）"],
+      ["负责人", "（待核）"],
+      ["员工规模", "≈ 1,000+（待核）"],
+      ["持股", "100%"],
+    ],
+    business: [
+      ["主营业务", "口腔/口腔黏膜递送技术研发与代工"],
+      ["制造", "丹麦 Vejle 工厂"],
+      ["营收贡献", "B2B 代工与技术服务"],
+      ["主要市场", "B2B（含竞争对手客户）"],
+    ],
+    products: ["尼古丁袋代工", "递送技术方案"],
+    markets: ["B2B"],
+    events: [
+      { year: "2021", text: "PMI 收购，补口腔递送技术" },
+      { year: "2023", text: "产线转供 ZYN 外溢需求" },
+    ],
+    risks: ["B2B 客户集中，与客户存在竞争关系", "技术专利到期与模仿"],
+  },
+  {
+    id: "PMI VEEV 业务单元", kind: "子公司", title: "PMI VEEV 业务单元", cat: "雾化",
+    enName: "雾化平台业务单元",
+    summary: "雾化品类经营单元，以代工为主、自有品牌运营，用于补齐产品组合短板。",
+    basic: [
+      ["节点类型", "业务单元"],
+      ["上级主体", "Philip Morris International Inc."],
+      ["所在地", "瑞士（运营）/ 中国深圳（代工）"],
+      ["负责人", "（待核）"],
+      ["员工规模", "（待核）"],
+      ["持股", "100%（自有品牌）"],
+    ],
+    business: [
+      ["主营业务", "VEEV 封闭式与一次性雾化设备"],
+      ["制造", "代工为主（中国深圳）"],
+      ["营收贡献", "规模小、增速高（待核）"],
+      ["主要市场", "欧洲 30+ 市场"],
+    ],
+    products: ["VEEV", "VEEV ONE"],
+    markets: ["欧洲", "其他监管放开市场"],
+    events: [
+      { year: "2019", text: "VEEV 封闭式设备发布" },
+      { year: "2023", text: "VEEV ONE 一次性设备上市" },
+    ],
+    risks: ["代工依赖，成本与关税波动", "一次性设备环保与监管压力"],
+  },
+  {
+    id: "Philip Morris USA（历史）", kind: "子公司", title: "Philip Morris USA（历史）", cat: "传统卷烟",
+    enName: "传统卷烟存量业务",
+    summary: "传统卷烟存量业务的现金牛：为无烟转型提供现金流，量随行业缓慢衰退。",
+    basic: [
+      ["节点类型", "业务单元（历史/存量）"],
+      ["上级主体", "Philip Morris International Inc."],
+      ["所在地", "全球 30+ 卷烟厂"],
+      ["负责人", "—"],
+      ["员工规模", "（待核）"],
+      ["持股", "—"],
+    ],
+    business: [
+      ["主营业务", "传统卷烟制造与销售"],
+      ["产能", "全球 30+ 卷烟厂"],
+      ["营收贡献", "全球 · 量 -2%/年"],
+      ["主要市场", "全球存量市场"],
+    ],
+    products: ["Marlboro（美国以外）", "本地卷烟品牌"],
+    markets: ["全球"],
+    events: [
+      { year: "2008", text: "随分拆进入 PMI 体系（美国权益另属奥驰亚）" },
+      { year: "2022", text: "无烟占比提升，卷烟资源逐步让位" },
+    ],
+    risks: ["美国卷烟业务实际由奥驰亚（Altria）持有，PMI 通过协议合作（待核）", "健康诉求与税制推动量长期下滑"],
+  },
+];
+
+export function findNode(id: string): NodeInfo | undefined {
+  return nodes.find((n) => n.id === id);
+}
+
+export function childNodes(id: string): NodeInfo[] {
+  const n = findNode(id);
+  if (!n?.children) return [];
+  return n.children.map(findNode).filter((x): x is NodeInfo => Boolean(x));
+}
