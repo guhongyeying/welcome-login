@@ -132,29 +132,51 @@ function Report() {
               {subDim === "cat" && <Chips items={["HNB低温", "雾化", "口含"] as D.Cat[]} value={subCat} onChange={setSubCat} />}
             </div>
             {subDim === "skeleton" ? (
-              <div className="mt-4">
-                <div className="mx-auto w-fit rounded-lg border border-primary bg-primary px-4 py-2 text-sm text-primary-foreground">Philip Morris International Inc.（母公司）</div>
-                <div className="mt-4 grid gap-4 lg:grid-cols-4">
-                  {D.GROUPS.map((g) => (
-                    <div key={g} className="space-y-3 border-t-2 border-primary pt-3">
-                      <p className="text-sm font-medium">{g}</p>
-                      {D.subsidiaries.filter((s) => s.group === g).map((s) => (
-                        <div key={s.name} className={card}>
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className="font-medium">{s.name}</h4>
-                          <span className="shrink-0 rounded bg-accent/15 px-2 py-0.5 text-xs text-accent">{s.cat}</span>
-                        </div>
-                        <ul className="mt-3 space-y-1.5 text-sm">
-                          <li><b className="font-medium text-muted-foreground">负责人 </b>{s.head}</li>
-                          <li><b className="font-medium text-muted-foreground">研发 </b>{s.rd}</li>
-                          <li><b className="font-medium text-muted-foreground">制造 </b>{s.factory}</li>
-                          <li><b className="font-medium text-muted-foreground">销售 </b>{s.sales}</li>
-                        </ul>
-                        {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
-                      </div>
-                      ))}
+              <div className="mt-6 overflow-x-auto pb-2" role="tree" aria-label="PMI 母公司与关键子公司骨架">
+                <div className="min-w-[960px]">
+                  <div className="flex justify-center">
+                    <div className="rounded-xl border border-primary bg-primary px-6 py-3 text-center text-primary-foreground shadow-sm" role="treeitem" aria-expanded="true">
+                      <p className="text-xs text-primary-foreground/70">母公司</p>
+                      <p className="mt-0.5 font-medium">Philip Morris International Inc.</p>
                     </div>
-                  ))}
+                  </div>
+                  <div className="mx-auto h-7 w-px bg-primary/40" />
+                  <div className="relative pt-7" role="group">
+                    <div className="absolute inset-x-[12.5%] top-0 h-px bg-primary/40" />
+                    <div className="grid grid-cols-4 gap-4">
+                      {D.GROUPS.map((g) => {
+                        const children = D.subsidiaries.filter((s) => s.group === g);
+                        return (
+                          <div key={g} className="relative" role="treeitem" aria-expanded="true">
+                            <div className="absolute -top-7 left-1/2 h-7 w-px bg-primary/40" />
+                            <div className="relative z-10 mx-auto w-fit min-w-32 rounded-lg border border-primary/40 bg-secondary px-4 py-2 text-center">
+                              <p className="text-sm font-medium">{g}</p>
+                              <p className="mt-0.5 text-xs text-muted-foreground">{children.length} 家子公司</p>
+                            </div>
+                            <div className="relative ml-4 mt-4 space-y-3 border-l border-primary/30 pl-4" role="group">
+                              {children.map((s) => (
+                                <div key={s.name} className={`${card} relative`} role="treeitem">
+                                  <span className="absolute -left-4 top-7 h-px w-4 bg-primary/30" />
+                                  <span className="absolute -left-[5px] top-[26px] size-2 rounded-full border border-primary/40 bg-background" />
+                                  <div className="flex items-start justify-between gap-2">
+                                    <h4 className="font-medium">{s.name}</h4>
+                                    <span className="shrink-0 rounded bg-accent/15 px-2 py-0.5 text-xs text-accent">{s.cat}</span>
+                                  </div>
+                                  <ul className="mt-3 space-y-1.5 text-sm">
+                                    <li><b className="font-medium text-muted-foreground">负责人 </b>{s.head}</li>
+                                    <li><b className="font-medium text-muted-foreground">研发 </b>{s.rd}</li>
+                                    <li><b className="font-medium text-muted-foreground">制造 </b>{s.factory}</li>
+                                    <li><b className="font-medium text-muted-foreground">销售 </b>{s.sales}</li>
+                                  </ul>
+                                  {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
