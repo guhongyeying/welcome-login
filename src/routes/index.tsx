@@ -236,7 +236,7 @@ function Report() {
                         return (
                           <div key={g} className="relative" role="treeitem" aria-expanded="true">
                             <div className="absolute -top-7 left-1/2 h-7 w-px bg-primary/40" />
-                            <button key={g} onClick={() => setNodeId(`group:${g}`)} title={`查看${g}详情`} className="relative z-10 mx-auto block w-fit min-w-32 rounded-lg border border-primary/40 bg-secondary px-4 py-2 text-center transition hover:border-primary hover:bg-primary/10">
+                            <button onClick={() => setNodeId(`group:${g}`)} title={`查看${g}详情`} className="relative z-10 mx-auto block w-fit min-w-32 rounded-lg border border-primary/40 bg-secondary px-4 py-2 text-center transition hover:border-primary hover:bg-primary/10">
                               <p className="text-sm font-medium">{g}</p>
                               <p className="mt-0.5 text-xs text-muted-foreground">{children.length} 家子公司</p>
                             </button>
@@ -281,7 +281,7 @@ function Report() {
                     <li><b className="font-medium text-muted-foreground">销售 </b>{s.sales}</li>
                   </ul>
                   {s.note && <p className="mt-3 text-xs text-accent">侧重：{s.note}</p>}
-                </div>
+                </button>
               ))}
             </div>
             )}
@@ -425,6 +425,7 @@ function Report() {
         </main>
       </div>
       )}
+      {nodeInfo && <NodePanel info={nodeInfo} onClose={() => setNodeId(null)} onOpen={(id) => setNodeId(id)} />}
     </div>
   );
 }
