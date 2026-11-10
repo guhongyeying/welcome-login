@@ -151,7 +151,7 @@ function BizMilestones() {
       </div>
       <div className={`${card} mt-3 overflow-x-auto`}>
         <ol className="relative flex min-w-max gap-4 pt-2">
-          <span className="absolute inset-x-0 top-[3.1rem] h-0.5 bg-border" aria-hidden />
+          <span className="absolute inset-x-0 top-[3.5rem] h-0.5 bg-border" aria-hidden />
           {list.map((m) => (
             <li key={m.year + m.title} className="relative w-48 shrink-0">
               <p className="font-serif text-3xl leading-none">{m.year}</p>
