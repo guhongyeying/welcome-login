@@ -464,3 +464,34 @@ export function childNodes(id: string): NodeInfo[] {
   if (!n?.children) return [];
   return n.children.map(findNode).filter((x): x is NodeInfo => Boolean(x));
 }
+
+// ============= 公司大事件（总公司 / PMI 自有品牌口径；示例整理，需以财报核实） =============
+export type CoEventType = "发展历史" | "产品历史" | "品牌投资" | "并购";
+export const CO_EVENT_TYPES: { key: CoEventType; desc: string }[] = [
+  { key: "发展历史", desc: "公司沿革与战略转折" },
+  { key: "产品历史", desc: "总公司自有品牌的产品发布" },
+  { key: "品牌投资", desc: "品牌权益、合作与投资" },
+  { key: "并购", desc: "收购 / 出售主体" },
+];
+export const coEvents: { date: string; type: CoEventType; title: string; detail: string; brand?: string; major?: boolean }[] = [
+  { date: "1847", type: "发展历史", title: "Philip Morris 伦敦开设烟草店", detail: "公司起源，后发展为国际化卷烟企业。" },
+  { date: "1924", type: "产品历史", title: "Marlboro 品牌推出", detail: "总公司核心卷烟品牌，后成为全球销量最大的卷烟品牌之一。", brand: "Marlboro" },
+  { date: "2008-03", type: "发展历史", title: "自奥驰亚（Altria）分拆独立上市", detail: "PMI 负责美国以外市场，NYSE 代码 PM。", major: true },
+  { date: "2014-11", type: "产品历史", title: "IQOS 名古屋 / 米兰试点上市", detail: "加热不燃烧（HNB）平台首发，配套 HEETS 烟弹。", brand: "IQOS", major: true },
+  { date: "2016", type: "发展历史", title: "提出「无烟未来」战略", detail: "公开承诺以无烟产品逐步替代卷烟。", major: true },
+  { date: "2016", type: "产品历史", title: "IQOS 日本全国铺开", detail: "日本成为 HNB 渗透率最高的市场。", brand: "IQOS" },
+  { date: "2018", type: "产品历史", title: "IQOS 3 / 3 MULTI 发布", detail: "缩短充电时间，支持连续使用。", brand: "IQOS" },
+  { date: "2019-04", type: "发展历史", title: "IQOS 获美国 FDA 上市许可（PMTA）", detail: "首个获 FDA 上市许可的 HNB 产品。", brand: "IQOS", major: true },
+  { date: "2019", type: "产品历史", title: "VEEV 雾化产品发布", detail: "总公司自有雾化品牌，封闭式设备。", brand: "VEEV" },
+  { date: "2020-01", type: "品牌投资", title: "与 KT&G 签署国际合作协议", detail: "由 PMI 在韩国以外市场销售 KT&G 的 lil 系列。", brand: "lil" },
+  { date: "2020-07", type: "发展历史", title: "IQOS 获 FDA 风险调整（MRTP）授权", detail: "允许以「降低暴露」口径进行宣传。", brand: "IQOS" },
+  { date: "2021-08", type: "产品历史", title: "IQOS ILUMA 感应加热 + TEREA 烟弹", detail: "无刀片、免清洁，逐步替换旧平台。", brand: "IQOS ILUMA", major: true },
+  { date: "2021-09", type: "并购", title: "收购 Fertin Pharma", detail: "补齐口腔递送技术与尼古丁袋代工能力。" },
+  { date: "2021-09", type: "并购", title: "收购 Vectura", detail: "吸入制剂技术，布局「超越尼古丁」健康业务。" },
+  { date: "2022-11", type: "并购", title: "收购 Swedish Match", detail: "取得 ZYN 口含品牌，进入美国无烟市场。", major: true },
+  { date: "2023", type: "产品历史", title: "VEEV ONE 一次性雾化上市", detail: "补充雾化产品线。", brand: "VEEV" },
+  { date: "2024-04", type: "品牌投资", title: "收回 IQOS 美国商业化权益", detail: "向奥驰亚支付约 27 亿美元，自主运营美国 IQOS。", brand: "IQOS", major: true },
+  { date: "2024", type: "并购", title: "出售 Vectura", detail: "退出吸入制剂业务，聚焦无烟主业。" },
+  { date: "2024", type: "产品历史", title: "IQOS ILUMA i 系列发布", detail: "新增交互屏与暂停功能。", brand: "IQOS ILUMA" },
+  { date: "2025", type: "发展历史", title: "无烟营收占比约 40%", detail: "目标 2030 年无烟营收占比超过 2/3。" },
+];
