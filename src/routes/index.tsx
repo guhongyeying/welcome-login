@@ -151,11 +151,10 @@ function BizMilestones() {
       </div>
       <div className={`${card} mt-3 overflow-x-auto`}>
         <ol className="relative flex min-w-max gap-4 pt-2">
-          <span className="absolute inset-x-0 top-[3.5rem] h-0.5 bg-border" aria-hidden />
           {list.map((m) => (
             <li key={m.year + m.title} className="relative w-48 shrink-0">
               <p className="font-serif text-3xl leading-none">{m.year}</p>
-              <span className={`relative z-10 mt-3 block h-3.5 w-3.5 rounded-full ${BIZ_STYLE[m.kind].dot}`} />
+              <div className="relative mt-3 flex h-3.5 items-center"><span className="absolute left-0 -right-4 h-0.5 bg-border" aria-hidden /><span className={`relative h-3.5 w-3.5 rounded-full ${BIZ_STYLE[m.kind].dot}`} /></div>
               <div className="mt-3 space-y-1.5">
                 <span className={`inline-block rounded px-1.5 py-0.5 text-[11px] ${BIZ_STYLE[m.kind].tag}`}>{m.kind}</span>
                 <p className="text-sm font-medium leading-snug">{m.title}</p>
