@@ -131,6 +131,45 @@ function CompanyEvents() {
   );
 }
 
+const BIZ_STYLE: Record<D.BizKind, { dot: string; tag: string }> = {
+  发展: { dot: "bg-primary", tag: "bg-primary text-primary-foreground" },
+  并购: { dot: "bg-accent", tag: "bg-accent text-accent-foreground" },
+  市场: { dot: "bg-background border-2 border-accent", tag: "border border-accent text-accent" },
+};
+
+function BizMilestones() {
+  const [kind, setKind] = useState<D.BizKind | "全部">("全部");
+  const list = D.milestones.filter((m) => kind === "全部" || m.kind === kind);
+  return (
+    <div className="mt-8">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="font-medium">商业大事记 · 大节点</h3>
+          <p className="text-xs text-muted-foreground">公司并购与发展历程的核心节点</p>
+        </div>
+        <Chips items={["发展", "并购", "市场"] as D.BizKind[]} value={kind} onChange={setKind} />
+      </div>
+      <div className={`${card} mt-3 overflow-x-auto`}>
+        <ol className="relative flex min-w-max gap-4 pt-2">
+          <span className="absolute inset-x-0 top-[3.1rem] h-0.5 bg-border" aria-hidden />
+          {list.map((m) => (
+            <li key={m.year + m.title} className="relative w-48 shrink-0">
+              <p className="font-serif text-3xl leading-none">{m.year}</p>
+              <span className={`relative z-10 mt-3 block h-3.5 w-3.5 rounded-full ${BIZ_STYLE[m.kind].dot}`} />
+              <div className="mt-3 space-y-1.5">
+                <span className={`inline-block rounded px-1.5 py-0.5 text-[11px] ${BIZ_STYLE[m.kind].tag}`}>{m.kind}</span>
+                <p className="text-sm font-medium leading-snug">{m.title}</p>
+                {m.metric && <p className="font-serif text-lg text-accent">{m.metric}</p>}
+                <p className="text-xs text-muted-foreground">{m.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
 function Tags({ label, items }: { label: string; items: string[] }) {
   if (!items.length) return null;
   return (
@@ -369,13 +408,7 @@ function Report() {
                 </div>
               ))}
             </div>
-            <ol className="mt-6 grid gap-3 md:grid-cols-4">
-              {D.milestones.map((m) => (
-                <li key={m.year} className="border-l-2 border-accent pl-3">
-                  <p className="font-serif text-xl">{m.year}</p><p className="text-sm text-muted-foreground">{m.text}</p>
-                </li>
-              ))}
-            </ol>
+            <BizMilestones />
             <CommercialCharts />
             <details className="mt-8">
             <summary className="cursor-pointer text-sm font-medium">基本数据 sheet（图表数据依据）</summary>
