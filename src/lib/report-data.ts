@@ -58,11 +58,18 @@ export const events: { year: number; lane: Lane; title: string; major?: boolean 
   { year: 2025, lane: "品牌", title: "ILUMA i 系列" },
 ];
 
-export const milestones = [
-  { year: "2014", text: "开始涉足低温烟业务，IQOS 首发" },
-  { year: "2019", text: "日本市场 HNB 渗透率接近 25%，IQOS 品类主导" },
-  { year: "2022", text: "无烟产品营收占比突破 30%" },
-  { year: "2025", text: "无烟营收占比约 40%，目标 2030 年超 2/3" },
+// 商业大事记 · 大节点（并购 / 发展历程核心节点；示例整理，需以财报核实）
+export type BizKind = "发展" | "并购" | "市场";
+export const milestones: { year: string; kind: BizKind; title: string; metric?: string; text: string }[] = [
+  { year: "2008", kind: "发展", title: "分拆独立上市", metric: "NYSE: PM", text: "自奥驰亚分拆，专注美国以外市场" },
+  { year: "2014", kind: "发展", title: "涉足低温烟业务", metric: "IQOS 首发", text: "名古屋 / 米兰试点，开启 HNB 品类" },
+  { year: "2016", kind: "发展", title: "提出无烟未来战略", text: "以无烟产品逐步替代卷烟" },
+  { year: "2019", kind: "市场", title: "日本市场渗透率达 50%", metric: "≈ 50%", text: "IQOS 主导日本 HNB 品类" },
+  { year: "2021", kind: "并购", title: "收购 Fertin Pharma / Vectura", text: "补口腔递送与吸入技术" },
+  { year: "2022", kind: "并购", title: "收购 Swedish Match", metric: "≈ $16B", text: "取得 ZYN，进入美国口含市场" },
+  { year: "2022", kind: "市场", title: "无烟营收占比突破 30%", metric: "> 30%", text: "无烟业务成为第二增长曲线" },
+  { year: "2024", kind: "并购", title: "收回 IQOS 美国权益", metric: "≈ $2.7B", text: "自主运营美国 HNB 市场" },
+  { year: "2025", kind: "市场", title: "无烟营收占比约 40%", metric: "≈ 40%", text: "目标 2030 年超过 2/3" },
 ];
 export const kpis = [
   { label: "总营收", value: "$37.9B", delta: "+7.7%" },
