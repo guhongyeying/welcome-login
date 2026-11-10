@@ -60,6 +60,77 @@ function KV({ title, rows }: { title: string; rows: [string, string][] }) {
   );
 }
 
+const TYPE_STYLE: Record<D.CoEventType, string> = {
+  发展历史: "bg-primary text-primary-foreground",
+  产品历史: "bg-accent text-accent-foreground",
+  品牌投资: "border border-accent text-accent",
+  并购: "border border-primary text-foreground",
+};
+
+function CompanyEvents() {
+  const [type, setType] = useState<D.CoEventType | "全部">("全部");
+  const [brand, setBrand] = useState<string>("全部");
+  const [majorOnly, setMajorOnly] = useState(false);
+  const brands = Array.from(new Set(D.coEvents.filter((e) => e.type === "产品历史" && e.brand).map((e) => e.brand as string)));
+  const showBrand = type === "全部" || type === "产品历史";
+  const b = showBrand ? brand : "全部";
+  const list = D.coEvents.filter(
+    (e) => (type === "全部" || e.type === type) && (!majorOnly || e.major) && (b === "全部" || e.brand === b),
+  );
+  return (
+    <div id="events" className="mt-8 scroll-mt-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="font-medium">公司大事件</h3>
+          <p className="text-xs text-muted-foreground">发展历史 · 产品历史（仅总公司自有品牌）· 品牌投资 · 并购时间线</p>
+        </div>
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <input type="checkbox" checked={majorOnly} onChange={(e) => setMajorOnly(e.target.checked)} /> 只看重大事件
+        </label>
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-4">
+        {D.CO_EVENT_TYPES.map((t) => {
+          const n = D.coEvents.filter((e) => e.type === t.key).length;
+          const on = type === t.key;
+          return (
+            <button key={t.key} onClick={() => setType(on ? "全部" : t.key)}
+              className={`rounded-lg border p-3 text-left transition ${on ? "border-primary bg-secondary" : "border-border bg-card hover:bg-secondary"}`}>
+              <p className="flex items-center justify-between text-sm font-medium">{t.key}<span className="font-serif text-lg">{n}</span></p>
+              <p className="text-xs text-muted-foreground">{t.desc}</p>
+            </button>
+          );
+        })}
+      </div>
+      {showBrand && (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">总公司品牌</span>
+          <Chips items={brands} value={brand} onChange={setBrand} />
+        </div>
+      )}
+      <ol className={`${card} mt-4 space-y-0`}>
+        {list.length === 0 && <li className="text-sm text-muted-foreground">没有符合条件的事件</li>}
+        {list.map((e, i) => (
+          <li key={e.date + e.title} className="grid grid-cols-[5.5rem_1.25rem_1fr] gap-x-3">
+            <span className="pt-0.5 text-right font-serif text-sm tabular-nums">{e.date}</span>
+            <span className="relative flex justify-center">
+              {i < list.length - 1 && <span className="absolute top-3 bottom-0 w-px bg-border" />}
+              <span className={`relative mt-1.5 rounded-full ${e.major ? "h-3 w-3 bg-accent ring-4 ring-accent/20" : "h-2 w-2 bg-muted-foreground/50"}`} />
+            </span>
+            <div className="pb-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`rounded px-1.5 py-0.5 text-[11px] ${TYPE_STYLE[e.type]}`}>{e.type}</span>
+                {e.brand && <span className="rounded bg-secondary px-1.5 py-0.5 text-[11px]">{e.brand}</span>}
+                <p className={`text-sm ${e.major ? "font-medium" : ""}`}>{e.title}</p>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{e.detail}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 function Tags({ label, items }: { label: string; items: string[] }) {
   if (!items.length) return null;
   return (
@@ -197,7 +268,7 @@ function Report() {
           ))}
         </nav>
         <main className="min-w-0 flex-1">
-          <Section id="info" title="1、公司基本信息" sub="法人主体 · 关键子公司骨架（点击任意节点查看基本信息与业务详情）">
+          <Section id="info" title="1、公司基本信息" sub="法人主体 · 公司大事件 · 关键子公司骨架（点击任意节点查看基本信息与业务详情）">
             <div className="grid gap-4 md:grid-cols-2">
               {[D.legal, D.profile].map((rows, i) => (
                 <div key={i} className={card}>
@@ -207,6 +278,7 @@ function Report() {
                 </div>
               ))}
             </div>
+            <CompanyEvents />
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <h3 className="font-medium">关键子公司骨架</h3>
