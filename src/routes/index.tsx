@@ -72,8 +72,10 @@ function CompanyEvents() {
   const [brand, setBrand] = useState<string>("全部");
   const [majorOnly, setMajorOnly] = useState(false);
   const brands = Array.from(new Set(D.coEvents.filter((e) => e.type === "产品历史" && e.brand).map((e) => e.brand as string)));
+  const showBrand = type === "全部" || type === "产品历史";
+  const b = showBrand ? brand : "全部";
   const list = D.coEvents.filter(
-    (e) => (type === "全部" || e.type === type) && (!majorOnly || e.major) && (brand === "全部" || e.brand === brand),
+    (e) => (type === "全部" || e.type === type) && (!majorOnly || e.major) && (b === "全部" || e.brand === b),
   );
   return (
     <div id="events" className="mt-8 scroll-mt-6">
@@ -99,7 +101,7 @@ function CompanyEvents() {
           );
         })}
       </div>
-      {(type === "全部" || type === "产品历史") && (
+      {showBrand && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground">总公司品牌</span>
           <Chips items={brands} value={brand} onChange={setBrand} />
