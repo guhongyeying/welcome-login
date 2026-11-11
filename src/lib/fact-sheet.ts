@@ -227,7 +227,8 @@ function shareCurve(cat: SheetCat, country: string, aff: number, y: number) {
 function generate(): Fact[] {
   const facts: Fact[] = [];
   let n = 0;
-  const push = (f: Omit<Fact, "id">) => facts.push({ id: `F${String(++n).padStart(5, "0")}`, ...f });
+  // 示例值四舍五入为 0 时取 0.1：零值只在有明确证据时填写
+  const push = (f: Omit<Fact, "id">) => facts.push({ id: `F${String(++n).padStart(5, "0")}`, ...f, value: f.value === 0 && !f.meta["零值依据"] ? 0.1 : f.value });
   const CORE: SheetCat[] = ["传统卷烟", "HNB低温", "雾化", "口含"];
   const pmiQuarterly = (y: number) => y >= 2019;
   const after = (y: number, q: number) => y > LATEST.year || (y === LATEST.year && q > LATEST.q);
