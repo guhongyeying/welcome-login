@@ -162,10 +162,10 @@ export function buildSeries(facts: Fact[], dim: Dim): Series[] {
     s.n.set(ck, (s.n.get(ck) ?? 0) + 1);
     s.values.set(ck, +((s.values.get(ck) ?? 0) + f.value).toFixed(2));
   }
+  // 比率类指标跨多行不可加总
+  const additive = facts.length ? metricDef(facts[0].metric).additive : true;
   return [...out.values()].map(({ n, ...s }) => {
-    if (!metricDef(facts.find((f) => (dim === "明细" ? rowKey(f) : true) && f)?.metric ?? "净营收").additive) {
-      for (const [ck, c] of n) if (c > 1) { s.values.set(ck, null); s.mixed = true; }
-    }
+    if (!additive) for (const [ck, c] of n) if (c > 1) { s.values.set(ck, null); s.mixed = true; }
     return s;
   });
 }
