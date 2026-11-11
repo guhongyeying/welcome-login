@@ -162,10 +162,10 @@ export function buildSeries(facts: Fact[], dim: Dim): Series[] {
     s.n.set(ck, (s.n.get(ck) ?? 0) + 1);
     s.values.set(ck, +((s.values.get(ck) ?? 0) + f.value).toFixed(2));
   }
+  // 比率类指标跨多行不可加总
+  const additive = facts.length ? metricDef(facts[0].metric).additive : true;
   return [...out.values()].map(({ n, ...s }) => {
-    if (!metricDef(facts.find((f) => (dim === "明细" ? rowKey(f) : true) && f)?.metric ?? "净营收").additive) {
-      for (const [ck, c] of n) if (c > 1) { s.values.set(ck, null); s.mixed = true; }
-    }
+    if (!additive) for (const [ck, c] of n) if (c > 1) { s.values.set(ck, null); s.mixed = true; }
     return s;
   });
 }
@@ -227,7 +227,8 @@ function shareCurve(cat: SheetCat, country: string, aff: number, y: number) {
 function generate(): Fact[] {
   const facts: Fact[] = [];
   let n = 0;
-  const push = (f: Omit<Fact, "id">) => facts.push({ id: `F${String(++n).padStart(5, "0")}`, ...f });
+  // 示例值四舍五入为 0 时取 0.1：零值只在有明确证据时填写
+  const push = (f: Omit<Fact, "id">) => facts.push({ id: `F${String(++n).padStart(5, "0")}`, ...f, value: f.value === 0 && !f.meta["零值依据"] ? 0.1 : f.value });
   const CORE: SheetCat[] = ["传统卷烟", "HNB低温", "雾化", "口含"];
   const pmiQuarterly = (y: number) => y >= 2019;
   const after = (y: number, q: number) => y > LATEST.year || (y === LATEST.year && q > LATEST.q);

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useEffect, useState, type ReactNode } from "react";
 import * as D from "@/lib/report-data";
-import { CommercialCharts } from "@/components/CommercialCharts";
+import { FactSheet } from "@/components/FactSheet";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -246,8 +246,6 @@ function Report() {
   const [subCat, setSubCat] = useState<D.Cat | "全部">("全部");
   const [subDim, setSubDim] = useState<"skeleton" | "cat">("skeleton");
   const [majorOnly, setMajorOnly] = useState(false);
-  const [metric, setMetric] = useState<(typeof D.METRICS)[number]>("销售额");
-  const [region, setRegion] = useState<(typeof D.REGIONS)[number] | "全部">("全部");
   const [supCat, setSupCat] = useState<D.Cat | "全部">("全部");
   const [supType, setSupType] = useState<(typeof D.SUPPLY)[number] | "全部">("全部");
   const [nodeId, setNodeId] = useState<string | null>(null);
@@ -397,7 +395,7 @@ function Report() {
             )}
           </Section>
 
-          <Section id="commercial" title="2、商业表现" sub="商业大事记 · 核心指标 · 基本数据 sheet">
+          <Section id="commercial" title="2、商业表现" sub="商业大事记 · 核心指标 · 基本数据 Sheet（大区→国家→市场 · 年度→季度）">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {D.kpis.map((k) => (
                 <div key={k.label} className={card}>
@@ -408,36 +406,7 @@ function Report() {
               ))}
             </div>
             <BizMilestones />
-            <CommercialCharts />
-            <details className="mt-8">
-            <summary className="cursor-pointer text-sm font-medium">基本数据 sheet（图表数据依据）</summary>
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <Chips items={D.REGIONS} value={region} onChange={setRegion} />
-              <div className="flex gap-1 rounded-lg bg-secondary p-1">
-                {D.METRICS.map((m) => (
-                  <button key={m} onClick={() => setMetric(m)} className={`rounded-md px-3 py-1 text-xs ${metric === m ? "bg-card shadow-sm" : "text-muted-foreground"}`}>{m}</button>
-                ))}
-              </div>
-            </div>
-            <div className={`${card} mt-4 overflow-x-auto p-0`}>
-              <table className="w-full min-w-[900px] text-xs">
-                <thead className="bg-secondary"><tr>
-                  <th className="p-2 text-left">地区</th><th className="p-2 text-left">品类</th>
-                  {D.YEARS.map((y) => <th key={y} className="p-2 text-right">{y}</th>)}
-                </tr></thead>
-                <tbody>
-                  {D.REGIONS.filter((r) => region === "全部" || r === region).flatMap((r) =>
-                    D.CATS.map((c, i) => (
-                      <tr key={r + c} className="border-t border-border">
-                        <td className="p-2 font-medium">{i === 0 ? r : ""}</td><td className="p-2">{c}</td>
-                        {D.YEARS.map((y) => <td key={y} className="p-2 text-right tabular-nums">{D.cell(r, c, y, metric)}</td>)}
-                      </tr>
-                    )),
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </details>
+            <FactSheet />
           </Section>
 
           <Section id="product" title="3、产品表现" sub="产品战略：各平台技术路线迭代">
